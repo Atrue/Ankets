@@ -3,7 +3,7 @@ var autoIncrement = require('mongoose-auto-increment');
 var helps = require('./helps');
 var MongoDB;
 
-var mongo_url = process.env.MONGOLAB_URI || process.env.OPENSHIFT_MONGODB_DB_URL || 'localhost/' + 'ankets';
+var mongo_url = process.env.MONGOLAB_URI || process.env.OPENSHIFT_MONGODB_DB_URL || 'localhost/ankets';
 
 
 MongoDB = mongoose.connect('mongodb://'+ mongo_url).connection;
