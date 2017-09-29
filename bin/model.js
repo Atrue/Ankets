@@ -3,9 +3,11 @@ var autoIncrement = require('mongoose-auto-increment');
 var helps = require('./helps');
 var MongoDB;
 
-var mongo_url = process.env.MONGOLAB_URI || process.env.OPENSHIFT_MONGODB_DB_URL || 'localhost/ankets';
+var mongo_url =  process.env.MONGODB_URI || process.env.MONGOLAB_URI ||
+                 process.env.OPENSHIFT_MONGODB_DB_URL || 'localhost/ankets';
 
 
+console.log('Connection to Mongo:' + mongo_url);
 MongoDB = mongoose.connect('mongodb://'+ mongo_url).connection;
 autoIncrement.initialize(MongoDB);
 MongoDB.on('error', function(err) { console.log('Mongo is not included:' + err.message); });
