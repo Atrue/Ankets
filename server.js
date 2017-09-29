@@ -1,137 +1,81 @@
-#!/bin/env node
 //  OpenShift sample Node application
-var express = require('express');
-var fs      = require('fs');
-var path = require('path');
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
+var express = require('express'),
+    app     = express(),
+    morgan  = require('morgan'),
+    bodyParser = require('body-parser'),
+    cookieParser = require('cookie-parser'),
+    fs = require('fs'),
+    path = require('path');
 
+Object.assign=require('object-assign');
 
-/**
- *  Define the sample application.
- */
-var SampleApp = function() {
+app.engine('html', require('ejs').renderFile);
+app.use(morgan('combined'));
 
-    //  Scope.
-    var self = this;
+var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
+    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
+    mongoURLLabel = "";
 
+if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
+    var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
+        mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
+        mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
+        mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
+        mongoPassword = process.env[mongoServiceName + '_PASSWORD'];
+    mongoUser = process.env[mongoServiceName + '_USER'];
 
-    /*  ================================================================  */
-    /*  Helper functions.                                                 */
-    /*  ================================================================  */
-
-    /**
-     *  Set up server IP address and port # using env variables/defaults.
-     */
-    self.setupVariables = function() {
-        //  Set the environment variables we need.
-        self.ipaddress = process.env.OPENSHIFT_NODEJS_IP;
-        self.port      = process.env.OPENSHIFT_NODEJS_PORT || 8180;
-
-        if (typeof self.ipaddress === "undefined") {
-            //  Log errors on OpenShift but continue w/ 127.0.0.1 - this
-            //  allows us to run/test the app locally.
-            console.warn('No OPENSHIFT_NODEJS_IP var, using 127.0.0.1');
-            self.ipaddress = "127.0.0.1";
-        };
-    };
-
-
-    /**
-     *  Retrieve entry (content) from cache.
-     *  @param {string} key  Key identifying content to retrieve from cache.
-     */
-    self.cache_get = function(key) { return self.zcache[key]; };
-
-
-    /**
-     *  terminator === the termination handler
-     *  Terminate server on receipt of the specified signal.
-     *  @param {string} sig  Signal to terminate on.
-     */
-    self.terminator = function(sig){
-        if (typeof sig === "string") {
-           console.log('%s: Received %s - terminating sample app ...',
-                       Date(Date.now()), sig);
-           process.exit(1);
+    if (mongoHost && mongoPort && mongoDatabase) {
+        mongoURLLabel = mongoURL = 'mongodb://';
+        if (mongoUser && mongoPassword) {
+            mongoURL += mongoUser + ':' + mongoPassword + '@';
         }
-        console.log('%s: Node server stopped.', Date(Date.now()) );
-    };
+        // Provide UI label that excludes user id and pw
+        mongoURLLabel += mongoHost + ':' + mongoPort + '/' + mongoDatabase;
+        mongoURL += mongoHost + ':' +  mongoPort + '/' + mongoDatabase;
 
+    }
+}
+var db = null,
+    dbDetails = new Object();
 
-    /**
-     *  Setup termination handlers (for exit and a list of signals).
-     */
-    self.setupTerminationHandlers = function(){
-        //  Process on exit and signals.
-        process.on('exit', function() { self.terminator(); });
+var initDb = function(callback) {
+    if (mongoURL == null) return;
 
-        // Removed 'SIGPIPE' from the list - bugz 852598.
-        ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-         'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
-        ].forEach(function(element, index, array) {
-            process.on(element, function() { self.terminator(element); });
-        });
-    };
+    var mongodb = require('mongodb');
+    if (mongodb == null) return;
 
+    mongodb.connect(mongoURL, function(err, conn) {
+        if (err) {
+            callback(err);
+            return;
+        }
 
-    /*  ================================================================  */
-    /*  App server functions (main app logic here).                       */
-    /*  ================================================================  */
+        db = conn;
+        dbDetails.databaseName = db.databaseName;
+        dbDetails.url = mongoURLLabel;
+        dbDetails.type = 'MongoDB';
 
+        console.log('Connected to MongoDB at: %s', mongoURL);
+    });
+};
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'app')));
+//  Add handlers for the app (from the routes).
+app.use('/', require('./bin/routes/index'));
+app.use('/model/', require('./bin/routes/ajax'));
+app.use('/auth/', require('./bin/routes/auth'));
+app.use('/admin/', require('./bin/routes/admin'));
+app.use('/excel/', require('./bin/routes/excel'));
 
-    /**
-     *  Initialize the server (express) and create the routes and register
-     *  the handlers.
-     */
-    self.initializeServer = function() {
-        self.app = express();
+initDb(function(err){
+    console.log('Error connecting to Mongo. Message:\n'+err);
+});
 
-        self.app.use(bodyParser.json());
-        self.app.use(bodyParser.urlencoded({ extended: false }));
-        self.app.use(cookieParser());
-        self.app.use(express.static(path.join(__dirname, 'app')));
-        //  Add handlers for the app (from the routes).
-        self.app.use('/', require('./bin/routes/index'));
-        self.app.use('/model/', require('./bin/routes/ajax'));
-        self.app.use('/auth/', require('./bin/routes/auth'));
-        self.app.use('/admin/', require('./bin/routes/admin'));
-        self.app.use('/excel/', require('./bin/routes/excel'));
-    };
+app.listen(port, ip);
+console.log('Server running on http://%s:%s', ip, port);
 
-
-    /**
-     *  Initializes the sample application.
-     */
-    self.initialize = function() {
-        self.setupVariables();
-        self.setupTerminationHandlers();
-
-        // Create the express server and routes.
-        self.initializeServer();
-    };
-
-
-    /**
-     *  Start the server (starts up the sample application).
-     */
-    self.start = function() {
-        //  Start the app on the specific interface (and port).
-        self.app.listen(self.port, self.ipaddress, function() {
-            console.log('%s: Node server started on %s:%d ...',
-                        Date(Date.now() ), self.ipaddress, self.port);
-        });
-    };
-
-};   /*  Sample Application.  */
-
-
-
-/**
- *  main():  Main code.
- */
-var zapp = new SampleApp();
-zapp.initialize();
-zapp.start();
-
+module.exports = app ;
