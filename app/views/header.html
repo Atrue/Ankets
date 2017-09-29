@@ -1,0 +1,49 @@
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="#">Анкеты</a>
+            <div class="nav-collapse collapse">
+                <p class="navbar-text pull-right ip-config" ng-click="openIP()" >
+                    IP: <span class="label" ng-class="{'label-warning':header.usedIP, 'label-info':!header.usedIP}" ng-bind="header.ip"></span>
+                    - <span class="label" ng-class="{'label-warning':header.usedIP, 'label-info':!header.usedIP}" ng-bind="header.usedIP ? 'Используется' : 'Свободен'"></span>
+                </p>
+                <ul class="nav">
+                    <li ng-class="{'active': header.current() === '/send' }"><a href="#send">Отправить</a></li>
+                    <li ng-class="{'active': header.current() === '/create' }"><a href="#create">Создать</a></li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+    <div ng-class="{'hide': !header.loading}">
+        <div class="progress progress-info progress-striped active">
+            <div class="bar" style="width: 100%"></div>
+        </div>
+    </div>
+    <script type="text/ng-template" id="headerForm.html">
+        <div class="modal-header" ng-class="{'bg-success': !modal.ipinfo().used, 'bg-error': modal.ipinfo().used}">
+            <h3 class="modal-title" id="modal-title" >
+                <span ng-bind="modal.ipinfo().ip"></span> -
+                <span ng-bind="modal.ipinfo().used ? 'Используется' : 'Свободен' "></span>
+            </h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div class="content">
+                <div ng-if="modal.ipinfo().history">
+                    <div class="center-align" ng-repeat="h in modal.ipinfo().history track by $index">
+                        <span class="label label-info">{{h._month.name}}</span> -
+                        {{h._resume.firstName}} {{h._resume.lastName}}
+                    </div>
+                </div>
+                <br class="clear">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn" type="button" ng-click="modal.cancel()">Закрыть</button>
+        </div>
+    </script>
+</div>

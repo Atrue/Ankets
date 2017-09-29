@@ -1,0 +1,210 @@
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="well sidebar-nav">
+                <div class="month-label-1">
+                    <div class="month-label-1">
+                        Месяц - <b ng-bind="model.getMonth().name"></b> <button class="btn btn-primary" ng-click="editMonth()">Редактировать</button>
+                        <br>
+                    </span>
+                    </div>
+                    <b>Выбрать месяц</b>
+                </div>
+                <ul class="nav nav-list">
+                    <li><a class="input-group">
+                            <input type="text" class="form-control hidden-input" uib-datepicker-popup datepicker-popup="MM/yyyy" ng-model="model.newmonth.date" is-open="model.newmonth.opened" datepicker-options="model.newmonth.options"  datepicker-mode="'month'" current-text="I>" clear-text="<-" close-text="X" />
+                            <a href='' ng-click="openMonth()">Новый месяц</a>
+                        </a>
+                    </li>
+                    <li ng-if="model.newmonth.date">
+                        {{getMonth(model.newmonth.date)}} - <button class="btn btn-small" ng-click="createMonth()">Создать</button>
+                    </li>
+                    <li class="divider"></li>
+                    <li ng-repeat="month in model.getAvailableMonths() track by $index" ng-class="{'active': month._id == model.getMonth()._id }">
+                        <a href="" ng-click="setMonth(month._id)">{{ month.name }}</a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+        <div class="span9">
+            <div class="hero-unit">
+                <div class="intro">
+                    <div class="main-month">
+                        <span class="page-button" ng-click="prevMonth()" ng-class="{'page-button-enabled': !isFirstMonth()}">
+                            <span aria-hidden="true" class="glyphicon glyphicon-chevron-left"></span>
+                        </span>
+                        <span ng-bind="model.getMonth().name"></span>
+                        <span class="page-button" ng-click="nextMonth()" ng-class="{'page-button-enabled': !isLastMonth()}">
+                            <span aria-hidden="true" class="glyphicon glyphicon-chevron-right"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <small><em>Создано <b>{{model.stats.all-model.stats.unregistered}}/{{model.stats.all}}</b>. Осталось: <b ng-bind="model.stats.unregistered"></b></em> <em ng-bind="textAnket(model.stats.unregistered)"></em></small>
+                <uib-progress>
+                    <uib-bar value="((model.stats.all - model.stats.unregistered)/model.stats.all)*100 || 0" title="Зарегистрировано: {{model.stats.all - model.stats.unregistered}}" type="info">{{Math.round((model.stats.all - model.stats.unregistered) / model.stats.all*100) || 0}}%</uib-bar>
+                </uib-progress>
+
+
+                <div class="statistics">
+                    <div class="statrow"><span class="sqare-info"></span>Зарегистрированно: <span>{{model.stats.all - model.stats.unregistered}} ({{Math.round((model.stats.all - model.stats.unregistered)/model.stats.all*100) || 0}}%)</span></div>
+                    <div class="statrow"></div>
+                    <div class="statrow"></div>
+                </div>
+                <div class="clearfix"></div>
+                <hr/>
+
+                <div class="statistics">
+                    <div class="wd-25"><input id="loadFile" type="file" class="hide" action-on-change="uploadFile"><button class="btn btn-info" ng-click="openFile()">Загрузить</button></div>
+                    <div class="wd-50"><div class=" alert alert-info null-margin">Для загрузки и выгрузки файла необходимо выбрать оригинальный файл</div></div>
+                    <div class="wd-25 text-right">
+                        <form enctype="multipart/form-data" id="exportForm" method="post" action="/excel/export">
+                        <input type="hidden" name="month" ng-value="model.getMonth()._id">
+                        <input name="file" id="saveFile" type="file" class="hide" action-on-change="downloadFile"><input type="button" class="btn btn-warning" ng-click="saveFile()" value="Сохранить">
+                        </form>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="orders row-fluid">
+                <div class="span6">
+                    Поиск
+                    <input type="text" class="input-medium search-query" placeholder="Поиск..." ng-model="model.searchPhrase">
+                </div>
+                <div class="span6 right-align">
+                    Просмотр:
+                    <div class="btn-group">
+                        <label class="btn btn-info" ng-model="model.orderType" uib-btn-radio="1" >Все</label>
+                        <label class="btn btn-info" ng-model="model.orderType" uib-btn-radio="2" >Незарегистрированные</label>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>
+                        #
+                    </th>
+                    <th>
+                        ФИО
+                    </th>
+                    <th>
+                        VIN
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-click="openAnket(ank)" ng-repeat="ank in model.getAnkets() track by $index" ng-class="{'warning': ank.status !== 0}">
+                    <td ng-switch on="ank.status">
+                        <i ng-switch-when="0" class="icon-pencil"></i>
+                        <i ng-switch-when="1" class="icon-envelope"></i>
+                        <i ng-switch-when="2" class="icon-eye-open"></i>
+                        <i ng-switch-when="3" class="icon-ok"></i>
+                        <i ng-switch-default class="icon-remove"></i>
+                    </td>
+                    <td ng-bind="ank._resume.firstName + ' ' + ank._resume.lastName"></td>
+                    <td ng-bind="ank._resume.VIN"></td>
+                    <td ng-bind="ank._resume.email"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <script type="text/ng-template" id="modalEditForm.html">
+        <div class="modal-header" ng-class="{'bg-warning': modal.ank.status !== 0}">
+            <h3 class="modal-title" id="modal-title" >
+                <span ng-bind="modal.getName()"></span>
+                <span class="about-status" ng-switch on="modal.ank.status">
+                    <span ng-switch-when="0" >(Не зарегистрирован)</span>
+                    <span ng-switch-when="1" >(Не отправлено)</span>
+                    <span ng-switch-when="2" >(Пустая)</span>
+                    <span ng-switch-when="3" >(Отправлено)</span>
+                    <span ng-switch-default >(Ошибка)</span>
+                </span>
+            </h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div class="content">
+                <div class="info">
+                    <h5>Данные</h5>
+                    <div class="control-group" ng-class="{'error': !modal.ank._resume.email, 'success': modal.ank._resume.email}" >
+                        <label class="control-label">Email: </label><input type="text" class="tx_copy form-control " ng-required="true" ng-model="modal.ank._resume.email"></div>
+                    <div >Пароль: <input type="text" class="tx_copy form-control " select-all ng-model="modal.ank._resume.password"></div>
+                    <div >Возвраст: <input type="text" class="tx_copy form-control " uib-datepicker-popup ng-model="modal.ank._resume.age" ng-required="true"/></div>
+                    <div >Сервис: <input type="text" class="tx_copy form-control "  ng-model="modal.ank.type"></div>
+                    <div >Имя: <textarea ng-readonly="!modal.editable" class="tx_copy" select-all ng-bind="modal.ank._resume.firstName"></textarea></div>
+                </div>
+                <div class="action">
+                    <h5>Действия</h5>
+                    <div>
+                        <a class="btn btn-primary btn-small" ng-click="modal.toMail('random')" target="_blank">
+                            Случайная регистрация
+                        </a>
+                    </div><br>
+                    <div>
+                        <a class="btn btn-primary btn-small" ng-click="modal.toMail('yandex')" target="_blank">
+                            Yandex
+                        </a>
+                        <a class="btn btn-primary btn-small" ng-click="modal.toMail('mail')" target="_blank">
+                            Mail
+                        </a>
+                        <a class="btn btn-primary btn-small" ng-click="modal.toMail('gmail')" target="_blank">
+                            Gmail
+                        </a>
+                    </div>
+                </div>
+                <div class="action">
+                    <h5>История</h5>
+                    <div ng-if="modal.ank.history" ng-repeat="m in modal.ank.history track by $index" >
+                        <span>{{m._month.name}}</span> -
+                        <span class="about-status" ng-switch on="m.status">
+                            <span ng-switch-when="0" class="label">Не зарегистрирован</span>
+                            <span ng-switch-when="1" class="label">Нет данных</span>
+                            <span ng-switch-when="2" class="label label-info">Пустая</span>
+                            <span ng-switch-when="3" class="label label-success">Отправлено</span>
+                            <span ng-switch-default class="label label-important">Ошибка</span>
+                        </span>
+                    </div>
+                    <span ng-if="!modal.ank.history">Загрузка...</span>
+                </div>
+                <br class="clear">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="left-buttons">
+                <button class="btn btn btn-success" type="button" ng-click="modal.save()">Сохранить</button>
+            </div>
+            <button class="btn btn" type="button" ng-click="modal.cancel()">Закрыть</button>
+        </div>
+    </script>
+    <script type="text/ng-template" id="MonthEditForm.html">
+        <div class="modal-header">
+            <h3 class="modal-title" >
+                <span ng-bind="modal.month.name"></span>
+            </h3>
+        </div>
+        <div class="modal-body">
+            <div class="content">
+                <div>
+                    <div >Название: <input type="text" class="tx_copy form-control " ng-model="modal.month.name"></div><br>
+                    <div >Дата: <input type="text" class="tx_copy form-control " ng-model="modal.month.date" ng-required="true"/></div><br>
+                    <div >Дата Начала: <input type="text" class="tx_copy form-control "  ng-model="modal.month.startDate"></div><br>
+                    <div >Дата Окончания: <input type="text" class="tx_copy form-control "  ng-model="modal.month.endDate"></div><br>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="left-buttons">
+                <button class="btn btn btn-success" type="button" ng-click="modal.save()">Сохранить</button>
+            </div>
+            <button class="btn btn" type="button" ng-click="modal.cancel()">Закрыть</button>
+        </div>
+    </script>
+</div>

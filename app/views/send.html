@@ -1,0 +1,180 @@
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="well sidebar-nav">
+                <div class="month-label-1">
+                    Анкеты за <b ng-bind="model.getMonth().name"></b><br>
+                    <span ng-if="model.lostDays >= 0">
+                        Осталось: <b ng-bind="model.lostDays"></b> <span ng-bind="textDays(model.lostDays)"></span>
+                    </span>
+                    <span ng-if="model.lostDays < 0">
+                        Закончились: <b>{{Math.abs(model.lostDays)}}</b> <span ng-bind="textDays(model.lostDays)"></span> назад
+                    </span>
+                </div>
+                <div class="datepicker-filter">
+                    <div uib-datepicker ng-model="dt" class="well well-small datepicker-widget" datepicker-options="options"></div>
+                </div>
+                <span class="nav-header">Выбрать месяц</span>
+                <ul class="nav nav-list" ng-repeat="month in model.getAvailableMonths() track by $index">
+                    <li ng-class="{'active': month._id == model.getMonth()._id }"><a href="" ng-click="setMonth(month._id)">{{ month.name }}</a></li>
+
+                </ul>
+            </div>
+        </div>
+        <div class="span9">
+            <div class="hero-unit">
+                <div class="intro">
+                    <div class="main-month">
+                        <span class="page-button" ng-click="prevMonth()" ng-class="{'page-button-enabled': !isFirstMonth()}">
+                            <span aria-hidden="true" class="glyphicon glyphicon-chevron-left"></span>
+                        </span>
+                        <span ng-bind="model.getMonth().name"></span>
+                        <span class="page-button" ng-click="nextMonth()" ng-class="{'page-button-enabled': !isLastMonth()}">
+                            <span aria-hidden="true" class="glyphicon glyphicon-chevron-right"></span>
+                        </span>
+                    </div>
+                </div>
+
+                <small><em>Отправлено <b>{{model.stats.empty+model.stats.success}}/{{model.stats.all}}</b>. Осталось: <b ng-bind="model.stats.unchecked + model.stats.unregistered"></b></em> <em ng-bind="textAnket(model.stats.unchecked + model.stats.unregistered)"></em></small>
+                <uib-progress>
+                    <uib-bar value="(model.stats.success/model.stats.all)*100 || 0" title="Отправлено: {{model.stats.success}}" type="success">{{Math.round(model.stats.success/model.stats.all*100)  || 0 }}%</uib-bar>
+                    <uib-bar value="(model.stats.empty/model.stats.all)*100 || 0" title="Без анкет: {{model.stats.empty}}" type="info">{{Math.round(model.stats.empty / model.stats.all*100) || 0}}%</uib-bar>
+                    <uib-bar value="(model.stats.error/model.stats.all)*100 || 0" title="Ошибка: {{model.stats.success}}" type="danger">{{Math.round(model.stats.error/model.stats.all*100) || 0 }}%</uib-bar>
+                </uib-progress>
+
+
+                <div class="statistics">
+                    <div class="statrow"><span class="sqare-success"></span>Успешно: <span>{{model.stats.success}} ({{Math.round(model.stats.success/model.stats.all*100) || 0}}%)</span></div>
+                    <div class="statrow"><span class="sqare-info"></span>Без анкет: <span>{{model.stats.empty}} ({{Math.round(model.stats.empty/model.stats.all*100) || 0}}%)</span></div>
+                    <div class="statrow"><span class="sqare-danger"></span>Ошибка: <span>{{model.stats.error}} ({{Math.round(model.stats.error/model.stats.all*100) || 0}}%)</span></div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <div class="orders row-fluid">
+                <div class="span6">
+                    Поиск
+                    <input type="text" class="input-medium search-query" placeholder="Поиск..." ng-model="model.searchPhrase">
+                </div>
+                <div class="span6 right-align">
+                    Просмотр:
+                    <div class="btn-group">
+                        <label class="btn btn-info" ng-model="model.orderType" uib-btn-radio="1" >Все</label>
+                        <label class="btn btn-info" ng-model="model.orderType" uib-btn-radio="2" >Неотправленные</label>
+                        <label class="btn btn-info" ng-model="model.orderType" uib-btn-radio="3" ng-click="genRand()">Случайная</label>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            #
+                        </th>
+                        <th>
+                            ФИО
+                        </th>
+                        <th>
+                            VIN
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-click="openAnket(ank)" ng-repeat="ank in model.getAnkets() track by $index" ng-class="{'success': ank.status == 3, 'warning': ank.status == 2, 'error': ank.status == -1}">
+                        <td ng-switch on="ank.status">
+                            <i ng-switch-when="0" class="icon-pencil"></i>
+                            <i ng-switch-when="1" class="icon-envelope"></i>
+                            <i ng-switch-when="2" class="icon-eye-open"></i>
+                            <i ng-switch-when="3" class="icon-ok"></i>
+                            <i ng-switch-default class="icon-remove"></i>
+                        </td>
+                        <td ng-bind="ank._resume.firstName + ' ' + ank._resume.lastName"></td>
+                        <td ng-bind="ank._resume.VIN"></td>
+                        <td ng-bind="ank._resume.email"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <script type="text/ng-template" id="modalForm.html">
+        <div class="modal-header" ng-class="{'bg-success': modal.ank.status === 3, 'bg-warning': modal.ank.status === 2, 'bg-error': modal.ank.status === -1}">
+            <h3 class="modal-title" id="modal-title" >
+                <span ng-bind="modal.getName()"></span>
+                <span class="about-status" ng-switch on="modal.ank.status">
+                    <span ng-switch-when="0" >(Не зарегистрирован)</span>
+                    <span ng-switch-when="1" >(Не отправлено)</span>
+                    <span ng-switch-when="2" >(Пустая)</span>
+                    <span ng-switch-when="3" >(Отправлено)</span>
+                    <span ng-switch-default >(Ошибка)</span>
+                </span>
+            </h3>
+        </div>
+        <div class="modal-body" id="modal-body">
+            <div class="alert alert-block" ng-if="model.usedIP">
+                <strong>Предупреждение: </strong>
+                Этот ip <b ng-bind="model.ip"></b> уже использовался в этом месяце
+            </div>
+            <div class="content">
+                <div class="info">
+                    <h5>Данные</h5>
+                    <div >Email: <textarea ng-readonly="!modal.editable" class="tx_copy" select-all ng-model="modal.ank._resume.email"></textarea></div>
+                    <div >Пароль: <textarea ng-readonly="!modal.editable" class="tx_copy" select-all ng-model="modal.ank._resume.password"></textarea></div>
+                    <div >Возвраст: <textarea ng-readonly="!modal.editable" class="tx_copy" select-all ng-bind="modal.prettyAge(modal.ank._resume.age)"></textarea></div>
+                    <div >Сервис: <textarea ng-readonly="!modal.editable" class="tx_copy" select-all ng-bind="modal.ank.type"></textarea></div>
+                    <div >Имя: <textarea ng-readonly="!modal.editable" class="tx_copy" select-all ng-bind="modal.ank._resume.firstName"></textarea></div>
+
+                </div>
+                <div class="action">
+                    <h5>Действия</h5>
+                    <div>
+                        <a class="btn btn-primary" ng-click="modal.toMail(modal.ank)" target="_blank">
+                            На почту
+                        </a>
+                    </div>
+                </div>
+                <div class="action">
+                    <h5>История</h5>
+                    <div ng-if="modal.ank.history" ng-repeat="m in modal.ank.history track by $index" >
+                        <span>{{m._month.name}}</span> -
+                        <span class="about-status" ng-switch on="m.status">
+                            <span ng-switch-when="1" class="label">Не отправлено</span>
+                            <span ng-switch-when="2" class="label label-info">Пустая</span>
+                            <span ng-switch-when="3" class="label label-success">Отправлено</span>
+                            <span ng-switch-default class="label label-important">Ошибка</span>
+                        </span>
+                    </div>
+                    <span ng-if="!modal.ank.history">Загрузка...</span>
+                </div>
+                <br class="clear">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="left-buttons">
+                <button class="btn btn btn-success" type="button" ng-click="modal.setStatus(3)">Отправлено</button>
+                <div class="btn-group" uib-dropdown>
+                    <button id="split-button" type="button" class="btn btn-warning" ng-click="modal.setStatus(2)">Без анкеты</button>
+                    <button type="button" class="btn btn-warning" uib-dropdown-toggle>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="split-button">
+                        <li role="menuitem"><a ng-click="modal.setStatus(2)">Без анкеты</a></li>
+                        <li role="menuitem"><a ng-click="modal.setStatus(-1)">Ошибка</a></li>
+                        <li role="menuitem"><a ng-click="modal.setStatus(1)">Не отправлено</a></li>
+                    </ul>
+                </div>
+                <button class="btn btn btn-primary" ng-class="{'active': modal.editable}" type="button" ng-click="modal.editForm()">
+                    <span ng-if="modal.editable">Сохранить</span>
+                    <span ng-if="!modal.editable">Редактировать</span>
+                </button>
+
+            </div>
+            <button class="btn btn" type="button" ng-click="modal.cancel()">Закрыть</button>
+        </div>
+    </script>
+</div>
