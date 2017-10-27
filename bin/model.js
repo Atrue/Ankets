@@ -37,6 +37,14 @@ var shAnkets = mongoose.Schema({
     status: Number,
     ip: String
 });
+shResume.methods.getLastSentStatus = function() {
+    var resume = this;
+    return new Promise(function(resolve, reject) {
+        tbAnkets.findOne({'_resume': resume._id, status: {$nin: [0, 1]}}).sort('-_month').exec(function(err, anket) {
+            resolve(anket && anket.status);
+        });
+    })
+};
 shResume.plugin(autoIncrement.plugin, 'bcrResume');
 shMonth.plugin(autoIncrement.plugin, 'bcrMonth');
 shAnkets.plugin(autoIncrement.plugin, 'bcrAnkets');
@@ -102,7 +110,7 @@ exports.createEmptyResume = function(resume, callback){
     tbResume.create({
         firstName: resume.firstName,
         lastName: resume.lastName,
-        age: helps.randomAvailableDate(),
+        age: helps.randomAvailableAvgDate(),
         VIN: resume.VIN,
         password: resume.password,
         gender: resume.gender
@@ -167,7 +175,7 @@ exports.importResume = function(data){
                 _id: resume['id'] || resume['_id'],
                 firstName: resume['name'] || resume['firstName'],
                 lastName: resume['last_name'] || resume['lastName'],
-                age: resume['age'] !== "0000-00-00 00:00:00" ? resume['age'] : helps.randomAvailableDate(),
+                age: resume['age'] !== "0000-00-00 00:00:00" ? resume['age'] : helps.randomAvailableAvgDate(),
                 email: resume['email'],
                 VIN: resume['VIN'],
                 password: resume['password'],

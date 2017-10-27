@@ -286,7 +286,7 @@ function getCookie(name) {
 }
 function getAuthCookie(){
     var cookie = getCookie('ankAuth');
-    if(!cookie){
+    if(!cookie || cookie === 'null'){
         cookie = prompt('Anket Auth Password:');
         document.cookie = "ankAuth="+cookie;
     }

@@ -20,7 +20,8 @@ Ankets.controller('SendController', function($scope, $window, $uibModal, AReques
         function searchFilter(ank){
             return ank._resume.firstName.indexOf($scope.model.searchPhrase) !== -1 ||
                 ank._resume.lastName.indexOf($scope.model.searchPhrase) !== -1 ||
-                ank._resume.email.indexOf($scope.model.searchPhrase) !== -1;
+                ank._resume.email.indexOf($scope.model.searchPhrase) !== -1 ||
+                ank._resume.VIN.indexOf($scope.model.searchPhrase) !== -1;
         }
         if ($scope.model.orderType === 1 && !$scope.model.searchPhrase){
             return ARequester.getAnkets();

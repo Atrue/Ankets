@@ -35,7 +35,7 @@
                     </div>
                 </div>
 
-                <small><em>Отправлено <b>{{model.stats.empty+model.stats.success}}/{{model.stats.all}}</b>. Осталось: <b ng-bind="model.stats.unchecked + model.stats.unregistered"></b></em> <em ng-bind="textAnket(model.stats.unchecked + model.stats.unregistered)"></em></small>
+                <small><em>Отправлено <b>{{model.stats.empty+model.stats.success+model.stats.error}}/{{model.stats.all}}</b>. Осталось: <b ng-bind="model.stats.unchecked + model.stats.unregistered"></b></em> <em ng-bind="textAnket(model.stats.unchecked + model.stats.unregistered)"></em></small>
                 <uib-progress>
                     <uib-bar value="(model.stats.success/model.stats.all)*100 || 0" title="Отправлено: {{model.stats.success}}" type="success">{{Math.round(model.stats.success/model.stats.all*100)  || 0 }}%</uib-bar>
                     <uib-bar value="(model.stats.empty/model.stats.all)*100 || 0" title="Без анкет: {{model.stats.empty}}" type="info">{{Math.round(model.stats.empty / model.stats.all*100) || 0}}%</uib-bar>

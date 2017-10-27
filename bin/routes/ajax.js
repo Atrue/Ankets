@@ -39,7 +39,13 @@ router.post('/ankets/', AuthCheck, function(req, res, next){
                     ip: ip,
                     used: used
                 };
-                res.json(js);
+                Promise.all(js.ankets.map(function(a){
+                    return a._resume.getLastSentStatus().then(function(s){
+                        a._doc.lastSentStatus = s;
+                    })
+                })).then(function(){
+                    res.json(js);
+                });
             });
         }else{
             res.json({});

@@ -18,12 +18,17 @@ Ankets.controller('CreateController', function($scope, $window, $uibModal, ARequ
     $scope.model.getMonth = ARequester.getMonth;
     $scope.model.getAnkets = function(){
         function orderFilter(ank){
-            return ank.status == 0;
+            if ($scope.model.orderType === 2) {
+                return ank.status === 0;
+            } else if ($scope.model.orderType === 3){
+                return ank.lastSentStatus === -1;
+            }
         }
         function searchFilter(ank){
             return ank._resume.firstName.indexOf($scope.model.searchPhrase) !== -1 ||
                 ank._resume.lastName.indexOf($scope.model.searchPhrase) !== -1 ||
-                ank._resume.email.indexOf($scope.model.searchPhrase) !== -1;
+                ank._resume.email.indexOf($scope.model.searchPhrase) !== -1 ||
+                ank._resume.VIN.indexOf($scope.model.searchPhrase) !== -1;
         }
         if ($scope.model.orderType === 1 && !$scope.model.searchPhrase){
             return ARequester.getAnkets();
