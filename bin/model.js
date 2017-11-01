@@ -40,7 +40,7 @@ var shAnkets = mongoose.Schema({
 shResume.methods.getLastSentStatus = function() {
     var resume = this;
     return new Promise(function(resolve, reject) {
-        tbAnkets.findOne({'_resume': resume._id, status: {$nin: [0, 1]}}).sort('-_month').exec(function(err, anket) {
+        tbAnkets.findOne({'_resume': resume._id, status: {$ne: 0}}).sort('-_month').exec(function(err, anket) {
             resolve(anket && anket.status);
         });
     })
@@ -119,14 +119,23 @@ exports.createEmptyResume = function(resume, callback){
 exports.createAnket = function(anket, monthID){
     return new Promise(function(resolve, reject){
         exports.getOrCreateResumeByName(anket, function(err, object){
-            tbAnkets.create({
-                _month: monthID,
-                _resume: object._id,
-                type: anket.type,
-                status: object.email ? 1 : 0
-            }, function(err, object){
-                resolve(object);
-            })
+            var createWithStatus = function(status) {
+                tbAnkets.create({
+                    _month: monthID,
+                    _resume: object._id,
+                    type: anket.type,
+                    status: status
+                }, function(err, object){
+                    resolve(object);
+                })
+            };
+            if (object.email) {
+                object.getLastSentStatus().then(function(status){
+                    createWithStatus(status === -1 ? -1: 1);
+                })
+            } else {
+                createWithStatus(0);
+            }
         })
     });
 };

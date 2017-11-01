@@ -21,7 +21,7 @@ Ankets.controller('CreateController', function($scope, $window, $uibModal, ARequ
             if ($scope.model.orderType === 2) {
                 return ank.status === 0;
             } else if ($scope.model.orderType === 3){
-                return ank.lastSentStatus === -1;
+                return ank.status === -1;
             }
         }
         function searchFilter(ank){

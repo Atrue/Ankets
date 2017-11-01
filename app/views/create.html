@@ -100,7 +100,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-click="openAnket(ank)" ng-repeat="ank in model.getAnkets() track by $index" ng-class="{'warning': ank.status !== 0}">
+                <tr ng-click="openAnket(ank)" ng-repeat="ank in model.getAnkets() track by $index" ng-class="{'warning': ank.status !== 0 && ank.status !== -1}">
                     <td ng-switch on="ank.status">
                         <i ng-switch-when="0" class="icon-pencil"></i>
                         <i ng-switch-when="1" class="icon-envelope"></i>
