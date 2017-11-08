@@ -25,7 +25,7 @@ router.post('/import/', upload.single('file'), function(req, res, next){
         var lastRow = sheet.getLastRowNumber();
         parsePromise(3);
         function parsePromise(index){
-            if(index < lastRow){
+            if(index <= lastRow){
                 var row = sheet.getRow(index);
                 var email = row[13];
                 if(!email) {
