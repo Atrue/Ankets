@@ -75,11 +75,13 @@ router.post('/export/', upload.single('file'), function(req, res, next){
         kexcel.open(file.path).then(function(workbook) {
             var sheet = workbook.getSheet(0);
 
-            for(var i=3; i<sheet.getLastRowNumber(); i++){
+            for(var i=3; i<=sheet.getLastRowNumber(); i++){
                 var row = sheet.getRow(i);
                 var oEmail = row[13];
-                if(!oEmail){
-                    var nEmail = getEmail(row[1], row[2]);
+                var firstName = row[1];
+                var lastName = row[2];
+                if(!oEmail && firstName && lastName){
+                    var nEmail = getEmail(firstName, lastName);
                     if(nEmail) {
                         var cell = sheet.getCell(i, 14);
                         cell.v = [sheet.workbook.sharedStrings.getIndex(nEmail)];
