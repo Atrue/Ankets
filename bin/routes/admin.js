@@ -3,10 +3,9 @@ var router = express.Router();
 var model = require('../model');
 var fs = require('fs');
 var multer  = require('multer');
-var cfg = JSON.parse(fs.readFileSync('./static.json', 'utf-8'));
 
 var upload = multer({ dest: 'uploads/' });
-var admin_password = cfg.admin;
+var admin_password = process.env.ADMIN_PASSWORD || {};
 
 
 router.get('/export/table/', function(req, res, next){

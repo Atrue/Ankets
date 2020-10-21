@@ -161,7 +161,7 @@ Ankets.controller('FormModal', function ($scope, $uibModalInstance, $window, ARe
         }
     };
     $scope.modal.toMail = function(ank){
-        $window.open('/auth/log/'+ank._resume._id + '/');
+        $window.open(ARequester.getProxy() + '/auth/log/'+ank._resume._id + '/');
     };
     $scope.modal.setStatus = function(status){
         ARequester.setStatus(ank._resume._id, status, function(status){

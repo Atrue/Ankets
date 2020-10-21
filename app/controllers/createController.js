@@ -174,7 +174,7 @@ Ankets.controller('FormEditModal', function ($scope, $uibModalInstance, $window,
         return ank._resume.firstName.split(' ')[0] + ' ' + ank._resume.lastName;
     };
     $scope.modal.toMail = function(mail){
-        $window.open('/auth/reg/'+mail+'/');
+        $window.open(ARequester.getProxy() + '/auth/reg/'+mail+'/');
     };
     $scope.modal.save = function(){
         ARequester.updateResume(ank._resume, function(){

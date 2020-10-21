@@ -17,12 +17,23 @@ Ankets.factory('ARequester', function($http){
     var currentMonth;
     var availableMonths;
     var auth = getAuthCookie();
+    var proxy = getQueryVariable('proxy') || '';
     var loadingState = true;
     var ip = {
         ip: '',
         used: false,
         history: []
     };
+    function getQueryVariable(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split('&');
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split('=');
+            if (decodeURIComponent(pair[0]) == variable) {
+                return decodeURIComponent(pair[1]);
+            }
+        }
+    }
     function getMonthInfo(id){
         loadingState = true;
         $http({
@@ -204,6 +215,7 @@ Ankets.factory('ARequester', function($http){
         getAvailableMonths: function(){return availableMonths},
         getLoading: function(){return loadingState},
         getIpInfo: function(){return ip},
+        getProxy: function(){return proxy},
         reloadMonth: reloadMonth,
         getResumeHistory: getResumeHistory,
         setMonth: getMonthInfo,

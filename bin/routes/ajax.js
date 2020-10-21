@@ -1,11 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var model = require('../model');
-var fs = require('fs');
-var cfg = JSON.parse(fs.readFileSync('./static.json', 'utf-8'));
+var auth_password = process.env.AUTH_PASSWORD || {};
 /* MODEL CONNECTING */
 function AuthCheck(req, res, next){
-    if(req.body.auth != cfg.auth) {
+    if(req.body.auth !== auth_password) {
         res.json({});
     }else{
         next();
