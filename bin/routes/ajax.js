@@ -1,23 +1,15 @@
 var express = require('express');
 var router = express.Router();
 var model = require('../model');
-var auth_password = process.env.AUTH_PASSWORD || {};
+var helps = require('../helps');
 /* MODEL CONNECTING */
-function AuthCheck(req, res, next){
-    if(req.body.auth !== auth_password) {
-        res.json({});
-    }else{
-        next();
-    }
-}
 
-
-router.post('/months/', AuthCheck, function(req, res, next) {
+router.post('/months/', helps.auth_check, function(req, res, next) {
     model.getMonths(function(err, objects){
         res.json(objects);
     });
 });
-router.post('/ankets/', AuthCheck, function(req, res, next){
+router.post('/ankets/', helps.auth_check, function(req, res, next){
     var ip = getIP(req);
     var idMonth = req.body.idMonth;
     var js = {};
@@ -45,7 +37,13 @@ router.post('/ankets/', AuthCheck, function(req, res, next){
         }
     })
 });
-router.post('/history/', AuthCheck, function(req, res, next){
+router.post('/resume-info/', helps.auth_check, function(req, res, next){
+    var idResume = req.body.idResume;
+    model.getAnketsByResume(idResume, function(err, object){
+        res.json(object);
+    })
+});
+router.post('/history/', helps.auth_check, function(req, res, next){
     var idResume = req.body.idResume;
     model.getResumeHistory(idResume, function(err, objects){
         var months = [];
@@ -59,7 +57,7 @@ router.post('/history/', AuthCheck, function(req, res, next){
         res.json(result);
     })
 });
-router.post('/ip-history/', AuthCheck, function(req, res, next){
+router.post('/ip-history/', helps.auth_check, function(req, res, next){
     var ip = getIP(req);
     model.getAnkets({ip: ip}, {'_month.date': -1}, function(err, objects){
         if(!err){
@@ -69,7 +67,7 @@ router.post('/ip-history/', AuthCheck, function(req, res, next){
         }
     })
 });
-router.post('/set-status/', AuthCheck, function(req, res, next){
+router.post('/set-status/', helps.auth_check, function(req, res, next){
     var idResume = req.body.idResume;
     var month = req.body.month;
     var status = parseInt(req.body.status);
@@ -91,7 +89,7 @@ router.post('/set-status/', AuthCheck, function(req, res, next){
         res.json({status: false});
     }
 });
-router.post('/update/', AuthCheck, function(req, res, next){
+router.post('/update/', helps.auth_check, function(req, res, next){
     var resume = req.body.resume;
     var idMonth = req.body.month;
     var idResume = parseInt(resume._id);
@@ -118,7 +116,7 @@ router.post('/update/', AuthCheck, function(req, res, next){
         }
     });
 });
-router.post('/update-month/', AuthCheck, function(req, res, next){
+router.post('/update-month/', helps.auth_check, function(req, res, next){
     var month = req.body.month;
     var id = parseInt(month._id);
     var update = {
@@ -136,7 +134,7 @@ router.post('/update-month/', AuthCheck, function(req, res, next){
         }
     });
 });
-router.post('/add-month/', AuthCheck, function(req, res, next){
+router.post('/add-month/', helps.auth_check, function(req, res, next){
     var req_month = req.body.month;
     var req_year = req.body.year;
     if(req_month !== undefined && req_year !== undefined) {

@@ -1,3 +1,5 @@
+var auth_password = process.env.AUTH_PASSWORD || {};
+
 var MIN_DATE = new Date(1950, 0, 1);
 var MAX_DATE = new Date(1993, 0, 1);
 
@@ -13,3 +15,11 @@ exports.randomAvailableDate = function() {
 exports.randomAvailableAvgDate = function() {
     return Math.random() >= 0.5 ? exports.randomAvailableDate() : exports.randomDate(MIN_AVG_DATE, MAX_AVG_DATE);
 };
+
+exports.auth_check = function(req, res, next){
+    if(req.body.auth !== auth_password) {
+        res.json({});
+    }else{
+        next();
+    }
+}

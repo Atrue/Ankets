@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var model = require('../model');
+var helps = require('../helps');
 
 var mails = {
     yandex: {
@@ -33,7 +34,7 @@ var mails = {
 
 /* GO TO CLIENT MAIL*/
 
-router.get('/log/:id/', function(req, res, next){
+router.get('/log/:id/', helps.auth_check, function(req, res, next){
     var id = req.params.id;
     model.getResume(id, function(err, object){
         var status = false;
@@ -59,7 +60,7 @@ router.get('/log/:id/', function(req, res, next){
         }
     });
 });
-router.get('/reg/:mail/', function(req, res, next){
+router.get('/reg/:mail/', helps.auth_check, function(req, res, next){
     var mail = req.params.mail;
     if(mail === 'random'){
         var keys = Object.keys(mails);
