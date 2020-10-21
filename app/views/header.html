@@ -11,10 +11,10 @@
                 <p class="navbar-text pull-right ip-config" ng-click="openIP()" >
                     IP: <span class="label" ng-class="{'label-warning':header.usedIP, 'label-info':!header.usedIP}" ng-bind="header.ip"></span>
                     - <span class="label" ng-class="{'label-warning':header.usedIP, 'label-info':!header.usedIP}" ng-bind="header.usedIP ? 'Используется' : 'Свободен'"></span>
+                    <button type="button" class="btn btn-warning btn-small btn-restart" ng-if="header.proxyEnabled" ng-click="restartIP()">
+                        Перезагрузить
+                    </button>
                 </p>
-                <button type="button" class="btn btn-warning btn-small btn-restart" ng-if="header.proxyEnabled" ng-click="restartIP()">
-                    Перезагрузить
-                </button>
                 <ul class="nav">
                     <li ng-class="{'active': header.current() === '/send' }"><a href="#send">Отправить</a></li>
                     <li ng-class="{'active': header.current() === '/create' }"><a href="#create">Создать</a></li>

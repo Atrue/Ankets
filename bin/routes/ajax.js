@@ -39,7 +39,7 @@ router.post('/ankets/', helps.auth_check, function(req, res, next){
 });
 router.post('/resume-info/', helps.auth_check, function(req, res, next){
     var idResume = req.body.idResume;
-    model.getAnketsByResume(idResume, function(err, object){
+    model.getResume(idResume, function(err, object){
         res.json(object);
     })
 });
