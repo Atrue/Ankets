@@ -51,7 +51,7 @@ router.post('/import/', helps.auth_check, upload.single('file'), function(req, r
 
     });
 });
-router.post('/export/', helps.auth_check, upload.single('file'), function(req, res, next){
+router.post('/export/', upload.single('file'), function(req, res, next){
     var file = req.file;
     var month = req.body.month;
     if (!file || !file.path || !month){

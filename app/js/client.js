@@ -209,13 +209,14 @@ Ankets.factory('ARequester', function($http){
             }
         })
     }
-    function restartIP(){
+    function restartIP(callback){
         $http({
             method: 'GET',
             url: proxy + '/router/restart/',
             data: {auth: auth}
-        }).then(function(data){
+        }).then(function(){
             reloadMonth();
+            if(callback)callback();
         })
     }
     return {

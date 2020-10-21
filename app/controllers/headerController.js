@@ -37,7 +37,7 @@ Ankets.controller('HeaderController', function($scope, $window, $location, $uibM
             templateUrl: 'ipRestarting.html',
             size: 'lg',
         });
-        ARequester.restartIP().then(function() {
+        ARequester.restartIP(function() {
             modal.dismiss('cancel');
         });
     }
