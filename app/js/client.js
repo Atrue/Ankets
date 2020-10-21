@@ -18,6 +18,11 @@ Ankets.factory('ARequester', function($http){
     var availableMonths;
     var auth = getAuthCookie();
     var proxy = getQueryVariable('proxy') || '';
+    if (proxy) {
+        window.onbeforeunload = function() {
+            navigator.sendBeacon(proxy + '/exit/');
+        }
+    }
     var loadingState = true;
     var ip = {
         ip: '',

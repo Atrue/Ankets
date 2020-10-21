@@ -32,6 +32,9 @@ Ankets.controller('HeaderController', function($scope, $window, $location, $uibM
         });
     };
     $scope.restartIP = function(){
+        var result = confirm('Перезагрузить?');
+        if (!result) return;
+
         var modal = $uibModal.open({
             animation: true,
             templateUrl: 'ipRestarting.html',
