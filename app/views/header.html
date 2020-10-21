@@ -9,10 +9,10 @@
             <a class="brand" href="#">Анкеты</a>
             <div class="nav-collapse collapse">
                 <div class="pull-right">
-                    <p class="navbar-text ip-config" ng-click="openIP()" >
+                    <span class="navbar-text ip-config" ng-click="openIP()" >
                         IP: <span class="label" ng-class="{'label-warning':header.usedIP, 'label-info':!header.usedIP}" ng-bind="header.ip"></span>
                         - <span class="label" ng-class="{'label-warning':header.usedIP, 'label-info':!header.usedIP}" ng-bind="header.usedIP ? 'Используется' : 'Свободен'"></span>
-                    </p>
+                    </span>
                     <button type="button" class="btn btn-warning btn-small btn-restart" ng-if="header.proxyEnabled" ng-click="restartIP()">
                         Перезагрузить
                     </button>
