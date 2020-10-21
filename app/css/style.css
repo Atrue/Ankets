@@ -248,6 +248,6 @@ textarea[readonly]{
     font-size: 15px;
     padding: 4px;
 }
-.btn-restart {
-    margin: 0
+.ip-block .btn-restart {
+    margin: 0 0 0 24px;
 }
