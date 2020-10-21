@@ -3,6 +3,7 @@ Ankets.controller('HeaderController', function($scope, $window, $location, $uibM
     $scope.header.current = function(){
         return $location.path();
     };
+    $scope.header.proxyEnabled = !!ARequester.getProxy();
     $scope.$watch(
         function(){return ARequester.getIP()},
         function (n, o) {
@@ -30,6 +31,16 @@ Ankets.controller('HeaderController', function($scope, $window, $location, $uibM
             size: 'lg',
         });
     };
+    $scope.restartIP = function(){
+        var modal = $uibModal.open({
+            animation: true,
+            templateUrl: 'ipRestarting.html',
+            size: 'lg',
+        });
+        ARequester.restartIP().then(function() {
+            modal.dismiss('cancel');
+        });
+    }
 });
 Ankets.controller('headerModal', function ($scope, $uibModalInstance, $window, ARequester) {
     $scope.modal = {};

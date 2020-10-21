@@ -209,6 +209,15 @@ Ankets.factory('ARequester', function($http){
             }
         })
     }
+    function restartIP(){
+        $http({
+            method: 'GET',
+            url: proxy + '/router/restart/',
+            data: {auth: auth}
+        }).then(function(data){
+            reloadMonth();
+        })
+    }
     return {
         getMonth: function(){return currentMonth},
         getAnkets: function(){return ankets},
@@ -230,7 +239,8 @@ Ankets.factory('ARequester', function($http){
         uploadFile: uploadFile,
         newMonth: newMonth,
         getIP: getIP,
-        usedIP: usedIP
+        usedIP: usedIP,
+        restartIP: restartIP
     }
 });
 // press enter
