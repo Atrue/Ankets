@@ -316,7 +316,7 @@ function getAuthCookie(){
     var cookie = getCookie('ankAuth');
     if(!cookie || cookie === 'null'){
         cookie = prompt('Anket Auth Password:');
-        document.cookie = "ankAuth="+cookie;
+        document.cookie = "ankAuth="+cookie+"; max-age=86400000";
     }
     return cookie;
 }

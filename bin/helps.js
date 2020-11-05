@@ -16,8 +16,12 @@ exports.randomAvailableAvgDate = function() {
     return Math.random() >= 0.5 ? exports.randomAvailableDate() : exports.randomDate(MIN_AVG_DATE, MAX_AVG_DATE);
 };
 
+exports.is_auth = function(pwd) {
+    return pwd === auth_password;
+}
+
 exports.auth_check = function(req, res, next){
-    if(req.body.auth !== auth_password) {
+    if(!exports.is_auth(req.body.auth)) {
         res.json({});
     }else{
         next();

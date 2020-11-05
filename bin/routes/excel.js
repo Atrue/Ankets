@@ -9,10 +9,10 @@ var helps = require('../helps');
 var upload = multer({ dest: 'uploads/' });
 
 
-router.post('/import/', helps.auth_check, upload.single('file'), function(req, res, next){
+router.post('/import/', upload.single('file'), function(req, res, next){
     var file = req.file;
     var month = req.body.month;
-    if (!file || !file.path || !month){
+    if (!file || !file.path || !month || !helps.is_auth(req.body.auth)){
         res.json({status: false, message: "file and month are required"});
         return;
     }
