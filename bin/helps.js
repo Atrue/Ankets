@@ -1,10 +1,10 @@
 var auth_password = process.env.AUTH_PASSWORD || {};
 
-var MIN_DATE = new Date(1950, 0, 1);
-var MAX_DATE = new Date(1993, 0, 1);
+var MIN_DATE = new Date(1960, 0, 1);
+var MAX_DATE = new Date(1995, 0, 1);
 
 var MIN_AVG_DATE = new Date(1980, 0, 1);
-var MAX_AVG_DATE = new Date(1990, 0, 1);
+var MAX_AVG_DATE = new Date(1992, 0, 1);
 
 exports.randomDate = function(start, end) {
     return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));

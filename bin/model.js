@@ -130,6 +130,9 @@ exports.createAnket = function(anket, monthID){
                     resolve(object);
                 })
             };
+            if (err) {
+                console.error('createAnket', anket, err)
+            }
             if (object.email) {
                 object.getLastSentStatus().then(function(status){
                     createWithStatus(status === -1 ? -1: 1);
