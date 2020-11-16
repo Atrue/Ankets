@@ -8,7 +8,7 @@ var mongo_url =  process.env.MONGODB_URI || process.env.MONGOLAB_URI ||
 
 
 console.log('Connection to Mongo:' + mongo_url);
-mongoose.connect('mongodb://'+ mongo_url);
+mongoose.connect('mongodb+srv://'+ mongo_url);
 MongoDB = mongoose.connection;
 autoIncrement.initialize(MongoDB);
 MongoDB.on('error', function(err) { console.log('Mongo is not included:' + err.message); });
