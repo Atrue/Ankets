@@ -32,7 +32,7 @@ router.post('/import/', upload.single('file'), function(req, res, next){
                     var anket = {
                         firstName: getValue(row[1]),
                         lastName: getValue(row[2]),
-                        gender: getValue(row[3]),
+                        gender: getValue(row[3]) !== '2',
                         VIN: getValue(row[6]),
                         type: getValue(row[10]),
                         password: getValue(row[6]).slice(0, -1)
